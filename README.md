@@ -2,7 +2,7 @@
 
 語料文件是db/dgk_shooter_min.conv，来自于 https://github.com/rustch3n/dgk_lost_conv
 
-参考论文：
+參考論文：
 
 Sequence to Sequence Learning with Neural Networks
 
