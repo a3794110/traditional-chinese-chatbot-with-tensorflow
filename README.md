@@ -1,6 +1,8 @@
 # TensorFlow實現聊天機器人
 
 語料文件是db/dgk_shooter_min.conv，來在於 https://github.com/rustch3n/dgk_lost_conv
+但該語料本為簡體中文，故筆者已將他轉為繁體中文
+所以要下載的話還是下載這裡的dgk_shooter_min.7z
 
 參考論文：
 
