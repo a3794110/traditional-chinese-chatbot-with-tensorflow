@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-__author__ = 'qhduan@memect.co'
-
 import os
 import sys
 import json
@@ -94,8 +92,7 @@ class BucketData(object):
         self.size = self.cur.execute(sql).fetchall()[0][0]
 
     def all_answers(self, ask):
-        """找出所有数据库中符合ask的answer
-        """
+         
         sql = '''
         SELECT answer FROM conversation
         WHERE ask = '{}';
@@ -107,7 +104,7 @@ class BucketData(object):
 
     def random(self):
         while True:
-            # 选择一个[1, MAX(ROWID)]中的整数，读取这一行
+             
             rowid = np.random.randint(1, self.size + 1)
             sql = '''
             SELECT ask, answer FROM conversation
@@ -172,15 +169,15 @@ def generate_bucket_dbs(
     for encoder_size, decoder_size in buckets:
         key = (encoder_size, decoder_size)
         all_inserted[key] = 0
-    # 从input_dir列出数据库列表
+    
     db_paths = []
     for dirpath, _, filenames in os.walk(input_dir):
         for filename in (x for x in sorted(filenames) if x.endswith('.db')):
             db_path = os.path.join(dirpath, filename)
             db_paths.append(db_path)
-    # 对数据库列表中的数据库挨个提取
+     
     for db_path in db_paths:
-        print('读取数据库: {}'.format(db_path))
+        print('讀取數據庫: {}'.format(db_path))
         conn = sqlite3.connect(db_path)
         c = conn.cursor()
         def is_valid(s):
@@ -191,8 +188,7 @@ def generate_bucket_dbs(
                     if unk > tolerate_unk:
                         return False
             return True
-        # 读取最大的rowid，如果rowid是连续的，结果就是里面的数据条数
-        # 比SELECT COUNT(1)要快
+         
         total = c.execute('''SELECT MAX(ROWID) FROM conversation;''').fetchall()[0][0]
         ret = c.execute('''SELECT ask, answer FROM conversation;''')
         wait_insert = []
@@ -227,7 +223,7 @@ def generate_bucket_dbs(
 
 if __name__ == '__main__':
     print('generate bucket dbs')
-    # 来源数据库目录
+   
     db_path = ''
     if len(sys.argv) >= 2 and os.path.exists(sys.argv[1]):
         db_path = sys.argv[1]
@@ -240,9 +236,9 @@ if __name__ == '__main__':
         print('invalid db source path')
         exit(1)
 
-    # 输出目录
+    
     target_path = './bucket_dbs'
-    # 不存在就建
+    
     if not os.path.exists(target_path):
         os.makedirs(target_path)
     elif os.path.exists(target_path) and not os.path.isdir(target_path):
@@ -259,13 +255,13 @@ if __name__ == '__main__':
         buckets,
         1
     )
-    # 导出字典
-    # print('一共找到{}个词'.format(len(word_count_arr)))
+   
+    # print('一共找到{}個詞'.format(len(word_count_arr)))
     # with open('dictionary_detail.json', 'w') as fp:
     #     json.dump(word_count_arr, fp, indent=4, ensure_ascii=False)
     # with open('dictionary.json', 'w') as fp:
     #     json.dump([x for x, _ in word_count_arr], fp, indent=4, ensure_ascii=False)
-    # 输出词库状况
+   
     for key, inserted_count in all_inserted.items():
         print(key)
         print(inserted_count)
