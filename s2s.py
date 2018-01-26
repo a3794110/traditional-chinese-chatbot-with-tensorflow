@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-
-__author__ = 'qhduan@memect.co'
+ 
 
 import os
 import sys
@@ -16,17 +15,17 @@ import s2s_model
 tf.app.flags.DEFINE_float(
     'learning_rate',
     0.0003,
-    '学习率'
+    '學習率'
 )
 tf.app.flags.DEFINE_float(
     'max_gradient_norm',
     5.0,
-    '梯度最大阈值'
+    '梯度最大閥值'
 )
 tf.app.flags.DEFINE_float(
     'dropout',
     1.0,
-    '每层输出DROPOUT的大小'
+    '每層輸出的DROPOUT的大小'
 )
 tf.app.flags.DEFINE_integer(
     'batch_size',
@@ -36,57 +35,57 @@ tf.app.flags.DEFINE_integer(
 tf.app.flags.DEFINE_integer(
     'size',
     1024,
-    'LSTM每层神经元数量'
+    'LSTM每層神經元數量'
 )
 tf.app.flags.DEFINE_integer(
     'num_layers',
     2,
-    'LSTM的层数'
+    'LSTM的層數'
 )
 tf.app.flags.DEFINE_integer(
     'num_epoch',
     5,
-    '训练几轮'
+    '訓練幾輪'
 )
 tf.app.flags.DEFINE_integer(
     'num_samples',
     512,
-    '分批softmax的样本量'
+    '分批softmax的樣本量'
 )
 tf.app.flags.DEFINE_integer(
     'num_per_epoch',
     500000,
-    '每轮训练多少随机样本'
+    '每輪訓練多少隨機樣本'
 )
 tf.app.flags.DEFINE_string(
     'buckets_dir',
     './bucket_dbs',
-    'sqlite3数据库所在文件夹'
+    'sqlite3數據庫所在文件夾'
 )
 tf.app.flags.DEFINE_string(
     'model_dir',
     './model2',
-    '模型保存的目录'
+    '模型保存的目錄'
 )
 tf.app.flags.DEFINE_string(
     'model_name',
     'model2',
-    '模型保存的名称'
+    '模型保存的名稱'
 )
 tf.app.flags.DEFINE_boolean(
     'use_fp16',
     False,
-    '是否使用16位浮点数（默认32位）'
+    '是否使用16位浮點數（默認32位）'
 )
 tf.app.flags.DEFINE_integer(
     'bleu',
     -1,
-    '是否测试bleu'
+    '是否測試bleu'
 )
 tf.app.flags.DEFINE_boolean(
     'test',
     False,
-    '是否在测试'
+    '是否在測試'
 )
 
 FLAGS = tf.app.flags.FLAGS
@@ -112,28 +111,28 @@ def create_model(session, forward_only):
     return model
 
 def train():
-    """训练模型"""
+    """訓練模型"""
     # 准备数据
-    print('准备数据')
+    print('準備數據')
     bucket_dbs = data_utils.read_bucket_dbs(FLAGS.buckets_dir)
     bucket_sizes = []
     for i in range(len(buckets)):
         bucket_size = bucket_dbs[i].size
         bucket_sizes.append(bucket_size)
-        print('bucket {} 中有数据 {} 条'.format(i, bucket_size))
+        print('bucket {} 中有數據 {} 條'.format(i, bucket_size))
     total_size = sum(bucket_sizes)
-    print('共有数据 {} 条'.format(total_size))
-    # 开始建模与训练
+    print('共有數據 {} 條'.format(total_size))
+    # 開始建模
     with tf.Session() as sess:
-        #　构建模型
+        #　構建模型
         model = create_model(sess, False)
-        # 初始化变量
+        # 初始化變量
         sess.run(tf.initialize_all_variables())
         buckets_scale = [
             sum(bucket_sizes[:i + 1]) / total_size
             for i in range(len(bucket_sizes))
         ]
-        # 开始训练
+        # 開始訓練
         metrics = '  '.join([
             '\r[{}]',
             '{:.1f}%',
@@ -148,7 +147,7 @@ def train():
             epoch_trained = 0
             batch_loss = []
             while True:
-                # 选择一个要训练的bucket
+                # 選擇一個要訓練的bucket
                 random_number = np.random.random_sample()
                 bucket_id = min([
                     i for i in range(len(buckets_scale))
@@ -196,20 +195,20 @@ def train():
 
 
 def test_bleu(count):
-    """测试bleu"""
+    """測試bleu"""
     from nltk.translate.bleu_score import sentence_bleu
     from tqdm import tqdm
-    # 准备数据
-    print('准备数据')
+    # 準備數據
+    print('準備數據')
     bucket_dbs = data_utils.read_bucket_dbs(FLAGS.buckets_dir)
     bucket_sizes = []
     for i in range(len(buckets)):
         bucket_size = bucket_dbs[i].size
         bucket_sizes.append(bucket_size)
-        print('bucket {} 中有数据 {} 条'.format(i, bucket_size))
+        print('bucket {} 中有數據 {} 條'.format(i, bucket_size))
     total_size = sum(bucket_sizes)
-    print('共有数据 {} 条'.format(total_size))
-    # bleu设置0的话，默认对所有样本采样
+    print('共有數據 {} 條'.format(total_size))
+    
     if count <= 0:
         count = total_size
     buckets_scale = [
@@ -217,16 +216,16 @@ def test_bleu(count):
         for i in range(len(bucket_sizes))
     ]
     with tf.Session() as sess:
-        #　构建模型
+        #　構建模型
         model = create_model(sess, True)
         model.batch_size = 1
-        # 初始化变量
+        # 初始化變量
         sess.run(tf.initialize_all_variables())
         model.saver.restore(sess, os.path.join(FLAGS.model_dir, FLAGS.model_name))
 
         total_score = 0.0
         for i in tqdm(range(count)):
-            # 选择一个要训练的bucket
+            # 選擇一個要訓練的bucket
             random_number = np.random.random_sample()
             bucket_id = min([
                 i for i in range(len(buckets_scale))
@@ -272,10 +271,10 @@ def test():
         def random(self):
             return sentence, ''
     with tf.Session() as sess:
-        #　构建模型
+        #　構建模型
         model = create_model(sess, True)
         model.batch_size = 1
-        # 初始化变量
+        # 初始化變量
         sess.run(tf.initialize_all_variables())
         model.saver.restore(sess, os.path.join(FLAGS.model_dir, FLAGS.model_name))
         sys.stdout.write("> ")
