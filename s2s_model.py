@@ -37,9 +37,9 @@ class S2SModel(object):
         output_projection = None
         softmax_loss_function = None
 
-        # 如果vocabulary太大，我们还是按照vocabulary来sample的话，内存会爆
+    
         if num_samples > 0 and num_samples < self.target_vocab_size:
-            print('开启投影：{}'.format(num_samples))
+            print('開啟投影：{}'.format(num_samples))
             w_t = tf.get_variable(
                 "proj_w",
                 [self.target_vocab_size, size],
@@ -54,8 +54,7 @@ class S2SModel(object):
             output_projection = (w, b)
 
             def sampled_loss(labels, logits):
-                labels = tf.reshape(labels, [-1, 1])
-                # 因为选项有选fp16的训练，这里同意转换为fp32
+                labels = tf.reshape(labels, [-1, 1]
                 local_w_t = tf.cast(w_t, tf.float32)
                 local_b = tf.cast(b, tf.float32)
                 local_inputs = tf.cast(logits, tf.float32)
@@ -91,15 +90,14 @@ class S2SModel(object):
         self.encoder_inputs = []
         self.decoder_inputs = []
         self.decoder_weights = []
-
-        # buckets中的最后一个是最大的（即第“-1”个）
+ 
         for i in range(buckets[-1][0]):
             self.encoder_inputs.append(tf.placeholder(
                 tf.int32,
                 shape=[None],
                 name='encoder_input_{}'.format(i)
             ))
-        # 输出比输入大 1，这是为了保证下面的targets可以向左shift 1位
+      
         for i in range(buckets[-1][1] + 1):
             self.decoder_inputs.append(tf.placeholder(
                 tf.int32,
@@ -203,10 +201,7 @@ class S2SModel(object):
             input_feed[self.decoder_inputs[i].name] = decoder_inputs[i]
             input_feed[self.decoder_weights[i].name] = decoder_weights[i]
 
-        # 理论上decoder inputs和decoder target都是n位
-        # 但是实际上decoder inputs分配了n+1位空间
-        # 不过inputs是第[0, n)，而target是[1, n+1)，刚好错开一位
-        # 最后这一位是没东西的，所以要补齐最后一位，填充0
+        
         last_target = self.decoder_inputs[decoder_size].name
         input_feed[last_target] = np.zeros([self.batch_size], dtype=np.int32)
 
