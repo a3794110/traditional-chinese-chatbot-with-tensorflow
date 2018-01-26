@@ -60,7 +60,7 @@ def insert_if(question, answer, cur, input_len=500, output_len=500):
 def main(file_path):
     lines = file_lines(file_path)
 
-    print('一共读取 %d 行数据' % len(lines))
+    print('一共讀取 %d 行數據' % len(lines))
 
     db = 'db/conversation.db'
     if os.path.exists(db):
@@ -85,7 +85,7 @@ def main(file_path):
         ask = a
         answer = b
         inserted += insert_if(ask, answer, cur)
-        # 批量提交
+       
         if inserted != 0 and inserted % 50000 == 0:
             conn.commit()
     conn.commit()
